@@ -13,7 +13,7 @@ jwt = JWTManager(app)
 CORS(app, resources={
     r"/*": {
         "origins": [
-            "https://hackathon-one-iota-59.vercel.app/",
+            "https://hackathon-one-iota-59.vercel.app",
             # "http://localhost:3000",  # React local dev
         ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
