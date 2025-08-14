@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class Users(db.Model):
     Id = db.Column(db.Integer, primary_key=True)
     Username = db.Column(db.String(255), nullable=False, unique=True)
-    Password = db.Column(db.Text, nullable=False)
+    Password = db.Column(db.String(255), nullable=False)
     Role = db.Column(db.String(255), nullable=False, default="User")
 
     def SetPassword(self, password):
@@ -14,8 +14,12 @@ class Users(db.Model):
         return check_password_hash(self.Password, password)
     
 
-# class Courses(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     Title = db.Column(db.String(255), nullable=False, unique=True)
-#     HPrice = db.Column(db.Integer, nullable=False)
-#     Type = db.Column(db.String(255), nullable=False)
+class Tasks(db.Model):
+    Id = db.Column(db.Integer, primary_key=True)
+    Category = db.Column(db.String(255), nullable=False, unique=True)
+    Section = db.Column(db.String(255), nullable=False)
+    Code = db.Column(db.String(255), nullable=False)
+    Disease = db.Column(db.String(255), nullable=False)
+    Dataset1 = db.Column(db.Text, nullable=False)
+    Dataset2 = db.Column(db.Text, nullable=True, default="")
+    Dataset3 = db.Column(db.Text, nullable=True, default="")
