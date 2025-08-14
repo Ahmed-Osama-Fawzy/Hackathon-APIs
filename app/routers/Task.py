@@ -3,10 +3,6 @@ from app import app, db
 from flask_jwt_extended import jwt_required, get_jwt
 from sqlalchemy import and_
 from app.models import Tasks
-import csv
-from io import StringIO
-import zipfile
-import xml.etree.ElementTree as ET
 
 @app.route("/GetAllTasks", methods=["GET"])
 @jwt_required()
@@ -14,7 +10,7 @@ def GetAllTasks():
     try:
         claims = get_jwt()
         role = claims.get("Role")
-        if role != "Admin":
+        if role == "Person":
             return jsonify({"Status": "Error", "Message": "Unauthorized"}), 403
 
         data = [
@@ -25,6 +21,7 @@ def GetAllTasks():
                 "Code": task.Code,
                 "Disease": task.Disease,
                 "Datasets": [task.Dataset1, task.Dataset2, task.Dataset3],
+                "Status": task.Status 
             }
             for task in Tasks.query.order_by(Tasks.Id.asc()).all()
         ]
@@ -36,7 +33,6 @@ def GetAllTasks():
     except Exception as e:
         db.session.rollback()
         return jsonify({"Status": "Error", "Message": str(e)}), 500
-
 
 @app.route("/InsertTask", methods=["POST"])
 @jwt_required()
@@ -75,6 +71,7 @@ def InsertTask():
             Section=section,
             Code=code,
             Disease=disease,
+            Status="Open",
             Dataset1=dataset1,
             Dataset2=dataset2,
             Dataset3=dataset3
@@ -136,7 +133,6 @@ def ModifyTask():
         db.session.rollback()
         return jsonify({"Status": "Error", "Message": str(e)}), 500
 
-
 @app.route("/DeleteTask", methods=["POST"])
 @jwt_required()
 def DeleteTask():
@@ -160,7 +156,11 @@ def DeleteTask():
     except Exception as e:
         db.session.rollback()
         return jsonify({"Status": "Error", "Message": str(e)}), 500
-    
+
+# import csv
+# from io import StringIO
+# import zipfile
+# import xml.etree.ElementTree as ET
 # @app.route("/UploadExcel", methods=["POST"])
 # @jwt_required()
 # def UploadExcel():
