@@ -86,7 +86,7 @@ def GetPersonTasks():
                 "Section": sel.task.Section,
                 "Code": sel.task.Code,
                 "Disease": sel.task.Disease,
-                "Status": sel.task.Disease,
+                "Status": sel.task.Status,
                 "Datasets": [sel.task.Dataset1, sel.task.Dataset2, sel.task.Dataset3],
                 "TeamUsername": sel.team.Username
             }
