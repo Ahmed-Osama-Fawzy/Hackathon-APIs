@@ -97,7 +97,7 @@ def SelectTask():
             return jsonify({"Status": "Warning", "Message": "You Already Select this Task Before"}), 400
 
         the_task = Tasks.query.get_or_404(TaskId)
-        if the_task.Status not in ["ReOpen", "Opened"]:
+        if the_task.Status not in ["ReOpen", "Open"]:
             return jsonify({"Status": "Warning", "Message": "This Task Already Closed"}), 400
 
         if SelectedTasksCount < 5:

@@ -42,7 +42,6 @@ def Login():
         
     except Exception as e:
         db.session.rollback()
-        print(str(e))
         return jsonify({"Status":"Warning", "Message":f"You have Error: {e}"}), 500
     
 @app.route("/Register", methods=["POST"])
@@ -76,7 +75,6 @@ def Register():
 
     except Exception as e:
         db.session.rollback()
-        print(str(e))
         return jsonify({"Status":"Warning", "Message":f"You have Error: {e}"}), 500
 
 @app.route("/CheckOTP", methods=["POST"])
@@ -103,7 +101,6 @@ def CheckOTP():
 
     except Exception as e:
         db.session.rollback()
-        print(str(e))
         return jsonify({"Status":"Warning", "Message":f"You have Error: {e}"}), 500
 
 @app.route("/ResendOTP", methods=["GET"])
@@ -119,5 +116,4 @@ def ResendOTP():
 
     except Exception as e:
         db.session.rollback()
-        print(str(e))
         return jsonify({"Status":"Warning", "Message":f"You have Error: {e}"}), 500
