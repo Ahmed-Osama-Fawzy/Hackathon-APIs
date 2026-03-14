@@ -94,7 +94,6 @@ def InsertTask():
 def InsertTasks():
     try:
         claims = get_jwt()
-
         if claims.get("Role") != "Admin":
             return jsonify({
                 "Status": "Error",
