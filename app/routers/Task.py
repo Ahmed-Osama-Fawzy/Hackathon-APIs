@@ -89,6 +89,88 @@ def InsertTask():
         db.session.rollback()
         return jsonify({ "Status": "Error", "Message": str(e)}), 500
     
+@app.route("/InsertTasks", methods=["POST"])
+@jwt_required()
+def InsertTasks():
+    try:
+        claims = get_jwt()
+
+        if claims.get("Role") != "Admin":
+            return jsonify({
+                "Status": "Error",
+                "Message": "Unauthorized"
+            }), 403
+
+        tasks_data = request.get_json(force=True)
+
+        if not isinstance(tasks_data, list):
+            return jsonify({
+                "Status": "Error",
+                "Message": "Invalid data format. Expected list."
+            }), 400
+
+        inserted_count = 0
+        skipped_count = 0
+
+        for data in tasks_data:
+
+            category = str(data.get("Category") or "").strip()
+            section = str(data.get("Section") or "").strip()
+            code = str(data.get("Code") or "").strip()
+            disease = str(data.get("Disease") or "").strip()
+
+            datasets = data.get("Datasets") or []
+
+            dataset1 = str(datasets[0]) if len(datasets) > 0 else ""
+            dataset2 = str(datasets[1]) if len(datasets) > 1 else ""
+            dataset3 = str(datasets[2]) if len(datasets) > 2 else ""
+
+            if not category or not section or not code or not disease:
+                skipped_count += 1
+                continue
+
+            duplicate = Tasks.query.filter(
+                Tasks.Category == category,
+                Tasks.Section == section,
+                Tasks.Code == code,
+                Tasks.Disease == disease
+            ).first()
+
+            if duplicate:
+                skipped_count += 1
+                continue
+
+            new_task = Tasks(
+                Category=category,
+                Section=section,
+                Code=code,
+                Disease=disease,
+                Status="Open",
+                Dataset1=dataset1,
+                Dataset2=dataset2,
+                Dataset3=dataset3
+            )
+
+            db.session.add(new_task)
+            inserted_count += 1
+
+        db.session.commit()
+
+        return jsonify({
+            "Status": "Success",
+            "Inserted": inserted_count,
+            "Skipped": skipped_count,
+            "Message": "Tasks processed successfully"
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print("SERVER ERROR:", e)
+
+        return jsonify({
+            "Status": "Error",
+            "Message": str(e)
+        }), 500
 @app.route("/ModifyTask", methods=["POST"])
 @jwt_required()
 def ModifyTask():
