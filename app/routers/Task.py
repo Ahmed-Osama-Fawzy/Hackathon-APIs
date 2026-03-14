@@ -39,18 +39,25 @@ def GetAllTasks():
 def InsertTask():
     try:
         claims = get_jwt()
-        if claims.get("Role") != "Admin":
-            return jsonify({"Status": "Error", "Message": "Unauthorized"}), 403
 
-        data = request.get_json()
-        category = data.get("Category")
-        section = data.get("Section")
-        code = data.get("Code")
-        disease = data.get("Disease")
+        if claims.get("Role") != "Admin":
+            return jsonify({ "Status": "Error", "Message": "Unauthorized"}), 403
+
+        data = request.get_json(force=True)
+
+        category = str(data.get("Category") or "").strip()
+        section = str(data.get("Section") or "").strip()
+        code = str(data.get("Code") or "").strip()
+        disease = str(data.get("Disease") or "").strip()
+
         datasets = data.get("Datasets") or []
 
-        if not all([category, section, code, disease, datasets]):
-            return jsonify({"Status": "Warning", "Message": "All required fields must be filled"}), 400
+        dataset1 = str(datasets[0]) if len(datasets) > 0 else ""
+        dataset2 = str(datasets[1]) if len(datasets) > 1 else ""
+        dataset3 = str(datasets[2]) if len(datasets) > 2 else ""
+
+        if not category or not section or not code or not disease:
+            return jsonify({ "Status": "Warning", "Message": "All required fields must be filled"}), 400
 
         duplicate = Tasks.query.filter(
             Tasks.Category == category,
@@ -62,10 +69,6 @@ def InsertTask():
         if duplicate:
             return jsonify({"Status": "Warning", "Message": "This record already exists"}), 409
 
-        dataset1 = datasets[0] if len(datasets) > 0 else ""
-        dataset2 = datasets[1] if len(datasets) > 1 else ""
-        dataset3 = datasets[2] if len(datasets) > 2 else ""
-
         new_task = Tasks(
             Category=category,
             Section=section,
@@ -76,15 +79,16 @@ def InsertTask():
             Dataset2=dataset2,
             Dataset3=dataset3
         )
+
         db.session.add(new_task)
         db.session.commit()
 
-        return jsonify({"Status": "Success", "Message": "Task inserted successfully"}), 201
+        return jsonify({ "Status": "Success", "Message": "Task inserted successfully"}), 201
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({"Status": "Error", "Message": str(e)}), 500
-
+        return jsonify({ "Status": "Error", "Message": str(e)}), 500
+    
 @app.route("/ModifyTask", methods=["POST"])
 @jwt_required()
 def ModifyTask():
